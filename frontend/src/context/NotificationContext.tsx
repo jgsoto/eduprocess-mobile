@@ -47,7 +47,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       const res = await apiClient.get("/notifications");
-      setNotifications(Array.isArray(res.data) ? res.data : []);
+      setNotifications(Array.isArray(res.data?.data) ? res.data.data : []);
     } catch (err) {
       setError("Error loading notifications");
     } finally {

@@ -1,16 +1,26 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { notificationService } from "../../services/notification/notificationService";
+import { useEffect } from "react";
 
 export function useNotifications() {
-  return useQuery({
+  const queryClient = useQueryClient();
+
+  const query = useQuery({
     queryKey: ["notifications"],
-
     queryFn: () => notificationService.getNotifications(),
-
-    staleTime: 1000 * 60,
-
+    staleTime: 0,
     retry: 1,
-
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
+    refetchOnMount: "always",
+    refetchInterval: 30000,
   });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [queryClient]);
+
+  return query;
 }

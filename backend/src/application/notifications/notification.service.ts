@@ -24,4 +24,15 @@ export class NotificationService {
         logger.info('Creating notification', { userId: input.userId, type: input.typeName });
         return this.notificationRepository.create(input);
     }
+
+    async createForAdmins(input: Omit<CreateNotificationInput, 'userId'>) {
+        const adminIds = await this.notificationRepository.findAdminIds();
+        logger.info('Creating notifications for admins', { adminCount: adminIds.length, type: input.typeName });
+        const results = await Promise.all(
+            adminIds.map((adminId) =>
+                this.notificationRepository.create({ ...input, userId: adminId })
+            )
+        );
+        return results;
+    }
 }

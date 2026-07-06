@@ -10,6 +10,14 @@ const notificationWithtype = Prisma.validator<Prisma.NotificationInclude>()({
 type NotificationWithtype = Prisma.NotificationGetPayload<{ include: typeof notificationWithtype }>;
 
 export class PrismaNotificationRepository implements NotificationRepository {
+    async findAdminIds(): Promise<string[]> {
+        const admins = await prisma.user.findMany({
+            where: { role: 'admin' },
+            select: { id: true },
+        });
+        return admins.map((a: { id: string }) => a.id);
+    }
+
     async findByUser(userId: string): Promise<NotificationDTO[]> {
         const notifications = await prisma.notification.findMany({
             where: { userId },

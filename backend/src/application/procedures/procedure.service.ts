@@ -147,6 +147,21 @@ export class ProcedureService {
             });
         }
 
+        if (this.notificationService) {
+            const studentName = await this.procedureRepository.findStudentCareer(studentId);
+            await this.notificationService.createForAdmins({
+                typeName: 'REQUEST_CREATED',
+                title: 'Nueva Solicitud',
+                message: `El estudiante ${studentName?.careerName ?? 'Desconocido'} creó una solicitud de "${procedure.name}".`,
+            });
+            await this.notificationService.createNotification({
+                userId: studentId,
+                typeName: 'REQUEST_CREATED',
+                title: 'Solicitud Enviada',
+                message: `Tu solicitud de "${procedure.name}" ha sido creada exitosamente.`,
+            });
+        }
+
         return request;
     }
 
